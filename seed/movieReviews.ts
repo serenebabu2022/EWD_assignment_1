@@ -1,139 +1,95 @@
 import { MovieReviews } from "../shared/types";
 
-export const movieReviews: MovieReviews[] = [
-    {
-        "id": 1234,
-        "reviewerName": "John Doe",
-        "year": 2022,
-        "genre_ids": [878],
-        "original_language": "en",
-        "original_title": "Rebel Moon - Part One: A Child of Fire",
-        "adult": false,
-        "overview": "When a peaceful colony on the edge of the galaxy finds itself threatened by the armies of the tyrannical Regent Balisarius, they dispatch Kora, a young woman with a mysterious past, to seek out warriors from neighboring planets to help them take a stand.",
-        "popularity": 2136.3,
-        "poster_path": "/sRLC052ieEzkQs9dEtPMfFxYkej.jpg",
-        "release_date": "2023-12-15",
-        "title": "Rebel Moon - Part One: A Child of Fire",
-        "video": false
-    },
-    {
-        "id": 2345,
-        "reviewerName": "Alice Smith",
-        "year": 2022,
-        "genre_ids": [28, 12, 14],
-        "original_language": "en",
-        "original_title": "Aquaman and the Lost Kingdom",
-        "adult": false,
-        "overview": "Black Manta, still driven by the need to avenge his father's death and wielding the power of the mythic Black Trident, will stop at nothing to take Aquaman down once and for all. To defeat him, Aquaman must turn to his imprisoned brother Orm, the former King of Atlantis, to forge an unlikely alliance in order to save the world from irreversible destruction.",
-        "popularity": 1605.303,
-        "poster_path": "/jXJxMcVoEuXzym3vFnjqDW4ifo6.jpg",
-        "release_date": "2023-12-20",
-        "title": "Aquaman and the Lost Kingdom",
-        "video": false
-    },
-    {
-        "id": 695721,
-        "reviewerName": "Emma Brown",
-        "year": 2022,
-        "genre_ids": [18, 878, 28],
-        "original_language": "en",
-        "original_title": "The Hunger Games: The Ballad of Songbirds & Snakes",
-        "adult": false,
-        "overview": "64 years before he becomes the tyrannical president of Panem, Coriolanus Snow sees a chance for a change in fortunes when he mentors Lucy Gray Baird, the female tribute from District 12.",
-        "popularity": 1509.974,
-        "poster_path": "/5a4JdoFwll5DRtKMe7JLuGQ9yJm.jpg",
-        "release_date": "2023-11-15",
-        "title": "The Hunger Games: The Ballad of Songbirds & Snakes",
-        "video": false
-    },
-    {
-        "id": 9834,
-        "reviewerName": "Serene Doe",
-        "year": 2022,
-        "genre_ids": [878],
-        "original_language": "en",
-        "original_title": "Rebel Moon - Part One: A Child of Fire",
-        "adult": false,
-        "overview": "When a peaceful colony on the edge of the galaxy finds itself threatened by the armies of the tyrannical Regent Balisarius, they dispatch Kora, a young woman with a mysterious past, to seek out warriors from neighboring planets to help them take a stand.",
-        "popularity": 2136.3,
-        "poster_path": "/sRLC052ieEzkQs9dEtPMfFxYkej.jpg",
-        "release_date": "2023-12-15",
-        "title": "Rebel Moon - Part One: A Child of Fire",
-        "video": false
-    },
-    {
-        "id": 8345,
-        "reviewerName": "Chris Smith",
-        "year": 2022,
-        "genre_ids": [28, 12, 14],
-        "original_language": "en",
-        "original_title": "Aquaman and the Lost Kingdom",
-        "adult": false,
-        "overview": "Black Manta, still driven by the need to avenge his father's death and wielding the power of the mythic Black Trident, will stop at nothing to take Aquaman down once and for all. To defeat him, Aquaman must turn to his imprisoned brother Orm, the former King of Atlantis, to forge an unlikely alliance in order to save the world from irreversible destruction.",
-        "popularity": 1605.303,
-        "poster_path": "/jXJxMcVoEuXzym3vFnjqDW4ifo6.jpg",
-        "release_date": "2023-12-20",
-        "title": "Aquaman and the Lost Kingdom",
-        "video": false
-    },
-    {
-        "id": 69521,
-        "reviewerName": "Emma Brown",
-        "year": 2022,
-        "genre_ids": [18, 878, 28],
-        "original_language": "en",
-        "original_title": "The Hunger Games: The Ballad of Songbirds & Snakes",
-        "adult": false,
-        "overview": "64 years before he becomes the tyrannical president of Panem, Coriolanus Snow sees a chance for a change in fortunes when he mentors Lucy Gray Baird, the female tribute from District 12.",
-        "popularity": 1509.974,
-        "poster_path": "/5a4JdoFwll5DRtKMe7JLuGQ9yJm.jpg",
-        "release_date": "2023-11-15",
-        "title": "The Hunger Games: The Ballad of Songbirds & Snakes",
-        "video": false
-    },
-    {
-        "id": 1029575,
-        "reviewerName": "Michael Johnson",
-        "year": 2022,
-        "genre_ids": [28, 35],
-        "original_language": "en",
-        "original_title": "The Family Plan",
-        "adult": false,
-        "overview": "Dan Morgan is many things: a devoted husband, a loving father, a celebrated car salesman. He's also a former assassin. And when his past catches up to his present, he's forced to take his unsuspecting family on a road trip unlike any other.",
-        "popularity": 954.371,
-        "poster_path": "/15Fe18IglCCP1jJoj5F529on0IA.jpg",
-        "release_date": "2023-12-14",
-        "title": "The Family Plan",
-        "video": false
-    },
-    {
-        "id": 787699,
-        "reviewerName": "Sophia Williams",
-        "year": 2022,
-        "genre_ids": [35, 10751, 14],
-        "original_language": "en",
-        "original_title": "Wonka",
-        "adult": false,
-        "overview": "Willy Wonka – chock-full of ideas and determined to change the world one delectable bite at a time – is proof that the best things in life begin with a dream, and if you’re lucky enough to meet Willy Wonka, anything is possible.",
-        "popularity": 949.214,
-        "poster_path": "/bmlkLCjrIWnnZzdAQ4uNPG9JFdj.jpg",
-        "release_date": "2023-12-06",
-        "title": "Wonka",
-        "video": false
-    },
-    {
-        "id": 891699,
-        "reviewerName": "David Miller",
-        "year": 2022,
-        "genre_ids": [28, 80],
-        "original_language": "en",
-        "original_title": "Silent Night",
-        "adult": false,
-        "overview": "A tormented father witnesses his young son die when caught in a gang's crossfire on Christmas Eve. While recovering from a wound that costs him his voice, he makes vengeance his life's mission and embarks on a punishing training regimen in order to avenge his son's death.",
-        "popularity": 945.22,
-        "poster_path": "/gg4zZoTggZmpAQ32qIrP5dtnkEZ.jpg",
-        "release_date": "2023-11-30",
-        "title": "Silent Night",
-        "video": false
-    }
-]
+export const movieReviews: MovieReviews[] =
+    [
+        {
+            "id": 1,
+            "MovieId": 1234,
+            "ReviewerName": "John Doe",
+            "ReviewDate": "2023-12-25",
+            "year": 2023,
+            "Content": "This movie was absolutely fantastic! The plot was engaging, the characters were well-developed, and the special effects were mind-blowing.",
+            "Rating": 5
+        },
+        {
+            "id": 2,
+            "MovieId": 2345,
+            "ReviewerName": "Jane Smith",
+            "ReviewDate": "2023-12-28",
+            "year": 2023,
+            "Content": "Aquaman and the Lost Kingdom exceeded all my expectations. The action sequences were thrilling, and the storyline kept me hooked from start to finish.",
+            "Rating": 4.5
+        },
+        {
+            "id": 3,
+            "MovieId": 695721,
+            "ReviewerName": "Michael Johnson",
+            "ReviewDate": "2023-11-20",
+            "year": 2023,
+            "Content": "I was skeptical at first, but The Hunger Games: The Ballad of Songbirds & Snakes turned out to be a gripping prequel with unexpected twists and turns.",
+            "Rating": 4
+        },
+        {
+            "id": 4,
+            "MovieId": 1029575,
+            "ReviewerName": "Sarah Brown",
+            "ReviewDate": "2023-12-14",
+            "year": 2023,
+            "Content": "The Family Plan is a delightful comedy with heartwarming moments. It's a feel-good movie that will leave you smiling.",
+            "Rating": 4.2
+        },
+        {
+            "id": 5,
+            "MovieId": 787699,
+            "ReviewerName": "Chris Evans",
+            "ReviewDate": "2023-12-06",
+            "year": 2023,
+            "Content": "Wonka is a visually stunning film with an enchanting storyline. It's a must-watch for both children and adults.",
+            "Rating": 4.8
+        },
+        {
+            "id": 6,
+            "MovieId": 891699,
+            "ReviewerName": "Emily Johnson",
+            "ReviewDate": "2023-11-30",
+            "year": 2023,
+            "Content": "Silent Night is a gripping thriller that keeps you on the edge of your seat. The suspense builds throughout the movie, leading to a satisfying conclusion.",
+            "Rating": 4.6
+        },
+        {
+            "id": 7,
+            "MovieId": 3456,
+            "ReviewerName": "Alex Parker",
+            "ReviewDate": "2023-12-18",
+            "year": 2023,
+            "Content": "The Matrix Resurrections is a visually stunning and thought-provoking sequel that stays true to the original while introducing fresh ideas.",
+            "Rating": 4.3
+        },
+        {
+            "id": 8,
+            "MovieId": 5678,
+            "ReviewerName": "Jessica Wilson",
+            "ReviewDate": "2023-12-10",
+            "year": 2023,
+            "Content": "Dune is an epic masterpiece that captivates with its breathtaking visuals and epic storytelling. A must-see for any sci-fi fan.",
+            "Rating": 4.9
+        },
+        {
+            "id": 9,
+            "MovieId": 9876,
+            "ReviewerName": "David Thompson",
+            "ReviewDate": "2023-12-02",
+            "year": 2023,
+            "Content": "Spider-Man: No Way Home is a thrilling rollercoaster ride from start to finish. It's packed with action, humor, and heartwarming moments.",
+            "Rating": 4.7
+        },
+        {
+            "id": 10,
+            "MovieId": 5432,
+            "ReviewerName": "Michelle Rodriguez",
+            "ReviewDate": "2023-11-27",
+            "year": 2023,
+            "Content": "Fast & Furious 10 delivers adrenaline-pumping action and heart-stopping stunts. It's a wild ride that fans of the franchise won't want to miss.",
+            "Rating": 4.4
+        }
+    ]
