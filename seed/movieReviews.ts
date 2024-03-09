@@ -31,7 +31,7 @@ export const movieReviews: MovieReviews[] =
         },
         {
             "id": 4,
-            "MovieId": 1029575,
+            "MovieId": 2345,
             "ReviewerName": "Sarah Brown",
             "ReviewDate": "2023-12-14",
             "year": 2023,
@@ -85,7 +85,7 @@ export const movieReviews: MovieReviews[] =
         },
         {
             "id": 10,
-            "MovieId": 5432,
+            "MovieId": 1234,
             "ReviewerName": "Michelle Rodriguez",
             "ReviewDate": "2023-11-27",
             "year": 2023,
