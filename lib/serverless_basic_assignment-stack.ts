@@ -19,11 +19,13 @@ export class ServerlessBasicAssignmentStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       tableName: "MoviesReviews",
     });
+
     // Define the Global Secondary Index (GSI)
     movieReviewsTable.addGlobalSecondaryIndex({
       indexName: 'MovieReviewsByMovieId', // GSI name
       partitionKey: { name: 'MovieId', type: dynamodb.AttributeType.NUMBER }, // GSI partition key
     });
+
     const getReviewsByMovieIdFn = new lambdanode.NodejsFunction(
       this,
       "GetReviewsByMovieIdFn",
@@ -92,5 +94,10 @@ export class ServerlessBasicAssignmentStack extends cdk.Stack {
       "GET",
       new apig.LambdaIntegration(getReviewsByMovieIdFn, { proxy: true })
     );
+    const moviesReviewEndpoint = moviesEndpoint.addResource("reviews");
+    moviesReviewEndpoint.addMethod(
+      "POST",
+      new apig.LambdaIntegration(newMovieReviewFn, { proxy: true })
+    )
   }
 }

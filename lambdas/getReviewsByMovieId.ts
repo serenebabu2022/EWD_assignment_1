@@ -1,13 +1,12 @@
-import { Handler } from "aws-lambda";
+import { APIGatewayProxyHandlerV2 } from "aws-lambda";
 
 import { DynamoDBClient, QueryCommand } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 
 const ddbDocClient = createDDbDocClient();
-console.log('marshall ddbDocClient', ddbDocClient)
 
-export const handler: Handler = async (event, context) => {
+export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
   try {
     console.log("Event: ", event);
     const parameters = event?.pathParameters;
@@ -76,7 +75,6 @@ function createDDbDocClient() {
   const unmarshallOptions = {
     wrapNumbers: false,
   };
-  console.log('marshall ddbClient', ddbClient)
 
   const translateConfig = { marshallOptions, unmarshallOptions };
   return DynamoDBDocumentClient.from(ddbClient, translateConfig);
