@@ -3,7 +3,6 @@ import { MovieReviews } from "../shared/types";
 export const movieReviews: MovieReviews[] =
     [
         {
-            "id": 1,
             "MovieId": 1234,
             "ReviewerName": "John Doe",
             "ReviewDate": "2023-12-25",
@@ -12,7 +11,6 @@ export const movieReviews: MovieReviews[] =
             "Rating": 5
         },
         {
-            "id": 2,
             "MovieId": 2345,
             "ReviewerName": "Jane Smith",
             "ReviewDate": "2023-12-28",
@@ -21,7 +19,6 @@ export const movieReviews: MovieReviews[] =
             "Rating": 4.5
         },
         {
-            "id": 3,
             "MovieId": 695721,
             "ReviewerName": "Michael Johnson",
             "ReviewDate": "2023-11-20",
@@ -30,7 +27,6 @@ export const movieReviews: MovieReviews[] =
             "Rating": 4
         },
         {
-            "id": 4,
             "MovieId": 2345,
             "ReviewerName": "Sarah Brown",
             "ReviewDate": "2023-12-14",
@@ -39,7 +35,6 @@ export const movieReviews: MovieReviews[] =
             "Rating": 4.2
         },
         {
-            "id": 5,
             "MovieId": 787699,
             "ReviewerName": "Chris Evans",
             "ReviewDate": "2023-12-06",
@@ -48,7 +43,6 @@ export const movieReviews: MovieReviews[] =
             "Rating": 4.8
         },
         {
-            "id": 6,
             "MovieId": 891699,
             "ReviewerName": "Emily Johnson",
             "ReviewDate": "2023-11-30",
@@ -57,7 +51,6 @@ export const movieReviews: MovieReviews[] =
             "Rating": 4.6
         },
         {
-            "id": 7,
             "MovieId": 3456,
             "ReviewerName": "Alex Parker",
             "ReviewDate": "2023-12-18",
@@ -66,7 +59,6 @@ export const movieReviews: MovieReviews[] =
             "Rating": 4.3
         },
         {
-            "id": 8,
             "MovieId": 5678,
             "ReviewerName": "Jessica Wilson",
             "ReviewDate": "2023-12-10",
@@ -75,7 +67,6 @@ export const movieReviews: MovieReviews[] =
             "Rating": 4.9
         },
         {
-            "id": 9,
             "MovieId": 9876,
             "ReviewerName": "David Thompson",
             "ReviewDate": "2023-12-02",
@@ -84,7 +75,6 @@ export const movieReviews: MovieReviews[] =
             "Rating": 4.7
         },
         {
-            "id": 10,
             "MovieId": 1234,
             "ReviewerName": "Michelle Rodriguez",
             "ReviewDate": "2023-11-27",

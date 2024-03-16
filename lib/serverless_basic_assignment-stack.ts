@@ -15,24 +15,23 @@ export class ServerlessBasicAssignmentStack extends cdk.Stack {
 
     const movieReviewsTable = new dynamodb.Table(this, "MoviesReviewsTable", {
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      partitionKey: { name: "id", type: dynamodb.AttributeType.NUMBER },
+      partitionKey: { name: "MovieId", type: dynamodb.AttributeType.NUMBER },
+      sortKey: { name: 'ReviewerName', type: dynamodb.AttributeType.STRING },
       removalPolicy: cdk.RemovalPolicy.DESTROY,
-      tableName: "MoviesReviews",
+      tableName: "MoviesReviews"
     });
 
-    // Define the Global Secondary Index (GSI)
-    movieReviewsTable.addGlobalSecondaryIndex({
-      indexName: 'MovieReviewsByMovieId', // GSI name
-      partitionKey: { name: 'MovieId', type: dynamodb.AttributeType.NUMBER }, // GSI partition key
-    });
-
-    const getReviewsByMovieIdFn = new lambdanode.NodejsFunction(
+    // movieReviewsTable.addLocalSecondaryIndex({
+    //   indexName: "ReviewDate",
+    //   sortKey: { name: "ReviewDate", type: dynamodb.AttributeType.STRING }
+    // })
+    const getReviewsFn = new lambdanode.NodejsFunction(
       this,
-      "GetReviewsByMovieIdFn",
+      "GetReviewsFn",
       {
         architecture: lambda.Architecture.ARM_64,
         runtime: lambda.Runtime.NODEJS_16_X,
-        entry: `${__dirname}/../lambdas/getReviewsByMovieId.ts`,
+        entry: `${__dirname}/../lambdas/getReviews.ts`,
         timeout: cdk.Duration.seconds(10),
         memorySize: 128,
         environment: {
@@ -54,7 +53,23 @@ export class ServerlessBasicAssignmentStack extends cdk.Stack {
       },
     });
 
-    new custom.AwsCustomResource(this, "moviesddbInitData", {
+    const getReviewsByNameAndYearFn = new lambdanode.NodejsFunction(
+      this,
+      "GetReviewsByNameAndYearFn",
+      {
+        architecture: lambda.Architecture.ARM_64,
+        runtime: lambda.Runtime.NODEJS_16_X,
+        entry: `${__dirname}/../lambdas/getReviewsByNameAndYear.ts`,
+        timeout: cdk.Duration.seconds(10),
+        memorySize: 128,
+        environment: {
+          TABLE_NAME: movieReviewsTable.tableName,
+          REGION: "eu-west-1",
+        },
+      }
+    );
+
+    new custom.AwsCustomResource(this, "movieReviewsDdbInitData", {
       onCreate: {
         service: "DynamoDB",
         action: "batchWriteItem",
@@ -63,7 +78,7 @@ export class ServerlessBasicAssignmentStack extends cdk.Stack {
             [movieReviewsTable.tableName]: generateBatch(movieReviews),
           },
         },
-        physicalResourceId: custom.PhysicalResourceId.of("moviesddbInitData"),
+        physicalResourceId: custom.PhysicalResourceId.of("movieReviewsDdbInitData"),
       },
       policy: custom.AwsCustomResourcePolicy.fromSdkCalls({
         resources: [movieReviewsTable.tableArn],
@@ -71,8 +86,9 @@ export class ServerlessBasicAssignmentStack extends cdk.Stack {
     });
 
     //Permissions
-    movieReviewsTable.grantReadData(getReviewsByMovieIdFn)
+    movieReviewsTable.grantReadData(getReviewsFn)
     movieReviewsTable.grantReadWriteData(newMovieReviewFn)
+    movieReviewsTable.grantReadData(getReviewsByNameAndYearFn)
 
     // REST API 
     const api = new apig.RestApi(this, "RestAPI", {
@@ -89,15 +105,24 @@ export class ServerlessBasicAssignmentStack extends cdk.Stack {
     });
     const moviesEndpoint = api.root.addResource("movies");
     const movieEndpoint = moviesEndpoint.addResource("{movieId}");
+
     const movieReviewsEndpoint = movieEndpoint.addResource("reviews");
     movieReviewsEndpoint.addMethod(
       "GET",
-      new apig.LambdaIntegration(getReviewsByMovieIdFn, { proxy: true })
+      new apig.LambdaIntegration(getReviewsFn, { proxy: true })
     );
+
     const moviesReviewEndpoint = moviesEndpoint.addResource("reviews");
     moviesReviewEndpoint.addMethod(
       "POST",
       new apig.LambdaIntegration(newMovieReviewFn, { proxy: true })
+    );
+
+    const reviewsByNameAndYear = movieReviewsEndpoint.addResource("{ReviewerNameOrYear}");
+    reviewsByNameAndYear.addMethod(
+      "GET",
+      new apig.LambdaIntegration(getReviewsByNameAndYearFn, { proxy: true })
     )
+
   }
 }
