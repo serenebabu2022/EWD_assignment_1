@@ -68,6 +68,21 @@ export class ServerlessBasicAssignmentStack extends cdk.Stack {
         },
       }
     );
+    const updateReviewsByNameFn = new lambdanode.NodejsFunction(
+      this,
+      "UpdateReviewsByNameFn",
+      {
+        architecture: lambda.Architecture.ARM_64,
+        runtime: lambda.Runtime.NODEJS_16_X,
+        entry: `${__dirname}/../lambdas/updateReview.ts`,
+        timeout: cdk.Duration.seconds(10),
+        memorySize: 128,
+        environment: {
+          TABLE_NAME: movieReviewsTable.tableName,
+          REGION: "eu-west-1",
+        },
+      }
+    );
 
     new custom.AwsCustomResource(this, "movieReviewsDdbInitData", {
       onCreate: {
@@ -89,7 +104,7 @@ export class ServerlessBasicAssignmentStack extends cdk.Stack {
     movieReviewsTable.grantReadData(getReviewsFn)
     movieReviewsTable.grantReadWriteData(newMovieReviewFn)
     movieReviewsTable.grantReadData(getReviewsByNameAndYearFn)
-
+    movieReviewsTable.grantReadWriteData(updateReviewsByNameFn)
     // REST API 
     const api = new apig.RestApi(this, "RestAPI", {
       description: "demo api",
@@ -122,6 +137,12 @@ export class ServerlessBasicAssignmentStack extends cdk.Stack {
     reviewsByNameAndYear.addMethod(
       "GET",
       new apig.LambdaIntegration(getReviewsByNameAndYearFn, { proxy: true })
+    )
+
+    // const updateReviewsByName = movieReviewsEndpoint.addResource("{ReviewerNameOrYear}");
+    reviewsByNameAndYear.addMethod(
+      "PUT",
+      new apig.LambdaIntegration(updateReviewsByNameFn, { proxy: true })
     )
 
   }

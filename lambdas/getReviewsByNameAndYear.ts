@@ -29,16 +29,18 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {    
         params.ExpressionAttributeValues ??= {}
 
         if (reviewerNameOrYear) {
-            if (isNumber(reviewerNameOrYear)) {
+            if (typeof reviewerNameOrYear === 'number') {
                 params.FilterExpression = "begins_with(ReviewDate, :year)";
                 params.ExpressionAttributeValues[":year"] = reviewerNameOrYear;
             } else {
-                params.KeyConditionExpression += " AND begins_with(ReviewerName, :ReviewerName)";
-                params.ExpressionAttributeValues[":ReviewerName"] = reviewerNameOrYear;
+                params.KeyConditionExpression += " AND ReviewerName = :reviewerName";
+                params.ExpressionAttributeValues[":reviewerName"] = reviewerNameOrYear;
+                // params.KeyConditionExpression += " AND begins_with(ReviewerName, :ReviewerName)";
+                // params.ExpressionAttributeValues[":ReviewerName"] = reviewerNameOrYear;
             }
         }
-        console.log('params values', params)
         commandOutput = await ddbDocClient.send(new QueryCommand(params));
+        console.log('output', commandOutput)
 
         if (!commandOutput.Items || commandOutput.Items.length === 0) {
             return {
@@ -67,9 +69,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {    
         };
     }
 };
-function isNumber(str: string): boolean {
-    return /^\d+$/.test(str);
-}
+
 function createDynamoDBDocumentClient() {
     const ddbClient = new DynamoDBClient({ region: process.env.REGION });
     const marshallOptions = {
