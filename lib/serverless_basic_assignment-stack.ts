@@ -21,17 +21,18 @@ export class ServerlessBasicAssignmentStack extends cdk.Stack {
       tableName: "MoviesReviews"
     });
 
-    // movieReviewsTable.addLocalSecondaryIndex({
-    //   indexName: "ReviewDate",
-    //   sortKey: { name: "ReviewDate", type: dynamodb.AttributeType.STRING }
-    // })
-    const getReviewsFn = new lambdanode.NodejsFunction(
+    movieReviewsTable.addGlobalSecondaryIndex({
+      indexName: 'ReviewerIndex',
+      partitionKey: { name: 'ReviewerName', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "MovieId", type: dynamodb.AttributeType.NUMBER },
+    });
+    const getReviewsByIdOrRatingFn = new lambdanode.NodejsFunction(
       this,
       "GetReviewsFn",
       {
         architecture: lambda.Architecture.ARM_64,
         runtime: lambda.Runtime.NODEJS_16_X,
-        entry: `${__dirname}/../lambdas/getReviews.ts`,
+        entry: `${__dirname}/../lambdas/getReviewsByIdOrRating.ts`,
         timeout: cdk.Duration.seconds(10),
         memorySize: 128,
         environment: {
@@ -83,6 +84,21 @@ export class ServerlessBasicAssignmentStack extends cdk.Stack {
         },
       }
     );
+    const getAllReviewsByNameFn = new lambdanode.NodejsFunction(
+      this,
+      "GetAllReviewsByNameFn",
+      {
+        architecture: lambda.Architecture.ARM_64,
+        runtime: lambda.Runtime.NODEJS_16_X,
+        entry: `${__dirname}/../lambdas/getAllReviewsByName.ts`,
+        timeout: cdk.Duration.seconds(10),
+        memorySize: 128,
+        environment: {
+          TABLE_NAME: movieReviewsTable.tableName,
+          REGION: "eu-west-1",
+        },
+      }
+    );
 
     new custom.AwsCustomResource(this, "movieReviewsDdbInitData", {
       onCreate: {
@@ -101,10 +117,11 @@ export class ServerlessBasicAssignmentStack extends cdk.Stack {
     });
 
     //Permissions
-    movieReviewsTable.grantReadData(getReviewsFn)
+    movieReviewsTable.grantReadData(getReviewsByIdOrRatingFn)
     movieReviewsTable.grantReadWriteData(newMovieReviewFn)
     movieReviewsTable.grantReadData(getReviewsByNameAndYearFn)
     movieReviewsTable.grantReadWriteData(updateReviewsByNameFn)
+    movieReviewsTable.grantReadData(getAllReviewsByNameFn)
     // REST API 
     const api = new apig.RestApi(this, "RestAPI", {
       description: "demo api",
@@ -124,7 +141,7 @@ export class ServerlessBasicAssignmentStack extends cdk.Stack {
     const movieReviewsEndpoint = movieEndpoint.addResource("reviews");
     movieReviewsEndpoint.addMethod(
       "GET",
-      new apig.LambdaIntegration(getReviewsFn, { proxy: true })
+      new apig.LambdaIntegration(getReviewsByIdOrRatingFn, { proxy: true })
     );
 
     const moviesReviewEndpoint = moviesEndpoint.addResource("reviews");
@@ -145,5 +162,10 @@ export class ServerlessBasicAssignmentStack extends cdk.Stack {
       new apig.LambdaIntegration(updateReviewsByNameFn, { proxy: true })
     )
 
+    const moviesByReviewer = moviesReviewEndpoint.addResource("{reviewerName}")
+    moviesByReviewer.addMethod(
+      "GET",
+      new apig.LambdaIntegration(getAllReviewsByNameFn, { proxy: true })
+    );
   }
 }
