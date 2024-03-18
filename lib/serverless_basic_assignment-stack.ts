@@ -99,6 +99,21 @@ export class ServerlessBasicAssignmentStack extends cdk.Stack {
         },
       }
     );
+    const getTranslatedReviewsFn = new lambdanode.NodejsFunction(
+      this,
+      "GetTranslatedReviewsFn",
+      {
+        architecture: lambda.Architecture.ARM_64,
+        runtime: lambda.Runtime.NODEJS_16_X,
+        entry: `${__dirname}/../lambdas/getTranslatedReview.ts`,
+        timeout: cdk.Duration.seconds(10),
+        memorySize: 128,
+        environment: {
+          TABLE_NAME: movieReviewsTable.tableName,
+          REGION: "eu-west-1",
+        },
+      }
+    );
 
     new custom.AwsCustomResource(this, "movieReviewsDdbInitData", {
       onCreate: {
@@ -122,6 +137,8 @@ export class ServerlessBasicAssignmentStack extends cdk.Stack {
     movieReviewsTable.grantReadData(getReviewsByNameAndYearFn)
     movieReviewsTable.grantReadWriteData(updateReviewsByNameFn)
     movieReviewsTable.grantReadData(getAllReviewsByNameFn)
+    movieReviewsTable.grantReadData(getTranslatedReviewsFn)
+
     // REST API 
     const api = new apig.RestApi(this, "RestAPI", {
       description: "demo api",
@@ -162,10 +179,19 @@ export class ServerlessBasicAssignmentStack extends cdk.Stack {
       new apig.LambdaIntegration(updateReviewsByNameFn, { proxy: true })
     )
 
-    const moviesByReviewer = moviesReviewEndpoint.addResource("{reviewerName}")
+    const reviewsEnd = api.root.addResource("reviews");
+    const moviesByReviewer = reviewsEnd.addResource("{reviewerName}")
     moviesByReviewer.addMethod(
       "GET",
       new apig.LambdaIntegration(getAllReviewsByNameFn, { proxy: true })
     );
+
+    const moviesByReviewerEnd = moviesByReviewer.addResource("{movieId}");
+    const translatedReviews = moviesByReviewerEnd.addResource("{translation}");
+    translatedReviews.addMethod(
+      "GET",
+      new apig.LambdaIntegration(getTranslatedReviewsFn, { proxy: true })
+    )
+
   }
 }

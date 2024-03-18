@@ -1,0 +1,97 @@
+import { APIGatewayProxyHandlerV2 } from "aws-lambda";
+import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
+import { TranslateClient, TranslateTextCommand } from "@aws-sdk/client-translate";
+
+const ddbDocClient = createDynamoDBDocumentClient();
+const translateClient = new TranslateClient({ region: process.env.REGION });
+
+export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
+    try {
+        console.log("Event: ", event);
+
+        // Extract reviewerName and movieId from path parameters
+        const { reviewerName, movieId } = event.pathParameters || {};
+
+        // Extract language from query string parameters
+        const language = event.queryStringParameters?.language;
+
+        if (!reviewerName || !movieId) {
+            return {
+                statusCode: 400,
+                headers: {
+                    "content-type": "application/json",
+                },
+                body: JSON.stringify({ message: "Missing reviewerName or movieId" }),
+            };
+        }
+
+        const getItemOutput = await ddbDocClient.send(new GetItemCommand({
+            TableName: process.env.TABLE_NAME,
+            Key: {
+                "ReviewerName": { S: reviewerName },
+                "MovieId": { N: movieId },
+            },
+        }));
+        console.log('output', getItemOutput)
+
+        if (!getItemOutput.Item) {
+            return {
+                statusCode: 404,
+                headers: {
+                    "content-type": "application/json",
+                },
+                body: JSON.stringify({ message: "No review found for given reviewerName and movieId" }),
+            };
+        }
+
+        const movieReview = getItemOutput.Item;
+        const translatedContent = await translateContent(movieReview.Content?.S, language);
+        return {
+            statusCode: 200,
+            headers: {
+                "content-type": "application/json",
+            },
+            body: JSON.stringify({
+                data: {
+                    ...getItemOutput.Item,
+                    Content: translatedContent,
+                },
+            }),
+        };
+    } catch (error: any) {
+        console.log(JSON.stringify(error));
+        return {
+            statusCode: 500,
+            headers: {
+                "content-type": "application/json",
+            },
+            body: JSON.stringify({ error }),
+        };
+    }
+};
+
+function createDynamoDBDocumentClient() {
+    const ddbClient = new DynamoDBClient({ region: process.env.REGION });
+    const marshallOptions = {
+        convertEmptyValues: true,
+        removeUndefinedValues: true,
+        convertClassInstanceToMap: true,
+    };
+    const unmarshallOptions = {
+        wrapNumbers: false,
+    };
+    const translateConfig = { marshallOptions, unmarshallOptions };
+    return DynamoDBDocumentClient.from(ddbClient, translateConfig);
+}
+
+// function for translation logic
+async function translateContent(content, targetLanguage) {
+    const commandOutput = await translateClient.send(new TranslateTextCommand({
+        Text: content,
+        SourceLanguageCode: "auto", // Let Amazon Translate detect the source language
+        TargetLanguageCode: targetLanguage,
+    }));
+
+    return commandOutput.TranslatedText;
+}
