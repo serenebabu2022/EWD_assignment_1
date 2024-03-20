@@ -3,6 +3,7 @@ import * as lambdanode from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import * as apig from "aws-cdk-lib/aws-apigateway";
+import * as iam from "aws-cdk-lib/aws-iam";
 
 import { Construct } from 'constructs';
 import * as custom from "aws-cdk-lib/custom-resources";
@@ -114,6 +115,14 @@ export class ServerlessBasicAssignmentStack extends cdk.Stack {
         },
       }
     );
+    getTranslatedReviewsFn.role?.attachInlinePolicy(new iam.Policy(this, 'TranslateTextPolicy', {
+      statements: [
+        new iam.PolicyStatement({
+          actions: ['translate:TranslateText'],
+          resources: ['*'],
+        }),
+      ],
+    }));
 
     new custom.AwsCustomResource(this, "movieReviewsDdbInitData", {
       onCreate: {

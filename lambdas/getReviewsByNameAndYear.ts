@@ -29,14 +29,12 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {    
         params.ExpressionAttributeValues ??= {}
 
         if (reviewerNameOrYear) {
-            if (typeof reviewerNameOrYear === 'number') {
+            if (!isNaN(Number(reviewerNameOrYear))) {
                 params.FilterExpression = "begins_with(ReviewDate, :year)";
                 params.ExpressionAttributeValues[":year"] = reviewerNameOrYear;
             } else {
                 params.KeyConditionExpression += " AND ReviewerName = :reviewerName";
                 params.ExpressionAttributeValues[":reviewerName"] = reviewerNameOrYear;
-                // params.KeyConditionExpression += " AND begins_with(ReviewerName, :ReviewerName)";
-                // params.ExpressionAttributeValues[":ReviewerName"] = reviewerNameOrYear;
             }
         }
         commandOutput = await ddbDocClient.send(new QueryCommand(params));

@@ -45,8 +45,16 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
             };
         }
 
-        const movieReview = getItemOutput.Item;
-        const translatedContent = await translateContent(movieReview.Content?.S, language);
+        const movieReview = getItemOutput.Item.Content?.S;
+        // const translateParams = {
+        //     Text: movieReview,
+        //     SourceLanguageCode: 'en',
+        //     TargetLanguageCode: language
+        // };
+        // const translateCommand = new TranslateTextCommand(translateParams);
+        // const translatedResult = await translateClient.send(translateCommand);
+
+        const translatedContent = await translateContent(movieReview, language);
         return {
             statusCode: 200,
             headers: {
@@ -89,7 +97,7 @@ function createDynamoDBDocumentClient() {
 async function translateContent(content, targetLanguage) {
     const commandOutput = await translateClient.send(new TranslateTextCommand({
         Text: content,
-        SourceLanguageCode: "auto", // Let Amazon Translate detect the source language
+        SourceLanguageCode: "en", //English is the default
         TargetLanguageCode: targetLanguage,
     }));
 
