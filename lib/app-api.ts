@@ -10,9 +10,14 @@ import * as custom from "aws-cdk-lib/custom-resources";
 import { generateBatch } from "../shared/util";
 import { movieReviews } from "../seed/movieReviews";
 
-export class ServerlessBasicAssignmentStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
-    super(scope, id, props);
+type AppApiProps = {
+  userPoolId: string;
+  userPoolClientId: string;
+};
+
+export class AppApi extends Construct {
+  constructor(scope: Construct, id: string, props: AppApiProps) {
+    super(scope, id);
 
     const movieReviewsTable = new dynamodb.Table(this, "MoviesReviewsTable", {
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
