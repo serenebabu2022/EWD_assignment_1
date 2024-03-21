@@ -14,6 +14,7 @@ import { movieReviews } from "../seed/movieReviews";
 type AppApiProps = {
   userPoolId: string;
   userPoolClientId: string;
+  dynamoDbTable: dynamodb.Table // Recieving DynamoDB table name as a prop
 };
 
 export class AppApi extends Construct {
@@ -41,20 +42,6 @@ export class AppApi extends Construct {
       },
     };
 
-    const movieReviewsTable = new dynamodb.Table(this, "MoviesReviewsTable", {
-      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      partitionKey: { name: "MovieId", type: dynamodb.AttributeType.NUMBER },
-      sortKey: { name: 'ReviewerName', type: dynamodb.AttributeType.STRING },
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      tableName: "MoviesReviews"
-    });
-
-    movieReviewsTable.addGlobalSecondaryIndex({
-      indexName: 'ReviewerIndex',
-      partitionKey: { name: 'ReviewerName', type: dynamodb.AttributeType.STRING },
-      sortKey: { name: "MovieId", type: dynamodb.AttributeType.NUMBER },
-    });
-
     const getReviewsByIdOrRatingFn = new lambdanode.NodejsFunction(
       this,
       "GetReviewsFn",
@@ -65,7 +52,7 @@ export class AppApi extends Construct {
         timeout: cdk.Duration.seconds(10),
         memorySize: 128,
         environment: {
-          TABLE_NAME: movieReviewsTable.tableName,
+          TABLE_NAME: props.dynamoDbTable.tableName,
           REGION: 'eu-west-1',
         },
       }
@@ -78,7 +65,7 @@ export class AppApi extends Construct {
       timeout: cdk.Duration.seconds(10),
       memorySize: 128,
       environment: {
-        TABLE_NAME: movieReviewsTable.tableName,
+        TABLE_NAME: props.dynamoDbTable.tableName,
         REGION: "eu-west-1",
       },
     });
@@ -93,7 +80,7 @@ export class AppApi extends Construct {
         timeout: cdk.Duration.seconds(10),
         memorySize: 128,
         environment: {
-          TABLE_NAME: movieReviewsTable.tableName,
+          TABLE_NAME: props.dynamoDbTable.tableName,
           REGION: "eu-west-1",
         },
       }
@@ -108,7 +95,7 @@ export class AppApi extends Construct {
         timeout: cdk.Duration.seconds(10),
         memorySize: 128,
         environment: {
-          TABLE_NAME: movieReviewsTable.tableName,
+          TABLE_NAME: props.dynamoDbTable.tableName,
           REGION: "eu-west-1",
         },
       }
@@ -123,7 +110,7 @@ export class AppApi extends Construct {
         timeout: cdk.Duration.seconds(10),
         memorySize: 128,
         environment: {
-          TABLE_NAME: movieReviewsTable.tableName,
+          TABLE_NAME: props.dynamoDbTable.tableName,
           REGION: "eu-west-1",
         },
       }
@@ -138,7 +125,7 @@ export class AppApi extends Construct {
         timeout: cdk.Duration.seconds(10),
         memorySize: 128,
         environment: {
-          TABLE_NAME: movieReviewsTable.tableName,
+          TABLE_NAME: props.dynamoDbTable.tableName,
           REGION: "eu-west-1",
         },
       }
@@ -152,29 +139,29 @@ export class AppApi extends Construct {
       ],
     }));
 
-    new custom.AwsCustomResource(this, "movieReviewsDdbInitData", {
+    new custom.AwsCustomResource(this, "moviesReviewsDdbInitData", {
       onCreate: {
         service: "DynamoDB",
         action: "batchWriteItem",
         parameters: {
           RequestItems: {
-            [movieReviewsTable.tableName]: generateBatch(movieReviews),
+            [props.dynamoDbTable.tableName]: generateBatch(movieReviews),
           },
         },
-        physicalResourceId: custom.PhysicalResourceId.of("movieReviewsDdbInitData"),
+        physicalResourceId: custom.PhysicalResourceId.of("moviesReviewsDdbInitData"),
       },
       policy: custom.AwsCustomResourcePolicy.fromSdkCalls({
-        resources: [movieReviewsTable.tableArn],
+        resources: [props.dynamoDbTable.tableArn],
       }),
     });
 
     //Permissions
-    movieReviewsTable.grantReadData(getReviewsByIdOrRatingFn)
-    movieReviewsTable.grantReadWriteData(newMovieReviewFn)
-    movieReviewsTable.grantReadData(getReviewsByNameAndYearFn)
-    movieReviewsTable.grantReadWriteData(updateReviewsByNameFn)
-    movieReviewsTable.grantReadData(getAllReviewsByNameFn)
-    movieReviewsTable.grantReadData(getTranslatedReviewsFn)
+    props.dynamoDbTable.grantReadData(getReviewsByIdOrRatingFn)
+    props.dynamoDbTable.grantReadWriteData(newMovieReviewFn)
+    props.dynamoDbTable.grantReadData(getReviewsByNameAndYearFn)
+    props.dynamoDbTable.grantReadWriteData(updateReviewsByNameFn)
+    props.dynamoDbTable.grantReadData(getAllReviewsByNameFn)
+    props.dynamoDbTable.grantReadData(getTranslatedReviewsFn)
 
     // REST API 
     const api = new apig.RestApi(this, "RestAPI", {
