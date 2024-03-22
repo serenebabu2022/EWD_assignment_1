@@ -5,6 +5,7 @@ import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import * as apig from "aws-cdk-lib/aws-apigateway";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as node from "aws-cdk-lib/aws-lambda-nodejs";
+import * as path from 'path';
 
 import { Construct } from 'constructs';
 import * as custom from "aws-cdk-lib/custom-resources";
@@ -41,6 +42,14 @@ export class AppApi extends Construct {
         REGION: cdk.Aws.REGION,
       },
     };
+    // Define the directory containing your layer code
+    const layerCodeDirectory = path.resolve(__dirname, '..', 'lambda-layer');
+    // Create the Lambda layer
+    const lambdaLayer = new lambda.LayerVersion(this, 'LambdaLayer', {
+      code: lambda.Code.fromAsset(layerCodeDirectory), // Provide the directory containing your layer code
+      compatibleRuntimes: [lambda.Runtime.NODEJS_16_X], // Specify the runtime(s) compatible with your layer
+      description: 'Lambda layer', // Optionally provide a description
+    });
 
     const getReviewsByIdOrRatingFn = new lambdanode.NodejsFunction(
       this,
@@ -55,6 +64,7 @@ export class AppApi extends Construct {
           TABLE_NAME: props.dynamoDbTable.tableName,
           REGION: 'eu-west-1',
         },
+        layers: [lambdaLayer]
       }
     );
 
@@ -68,6 +78,7 @@ export class AppApi extends Construct {
         TABLE_NAME: props.dynamoDbTable.tableName,
         REGION: "eu-west-1",
       },
+      layers: [lambdaLayer]
     });
 
     const getReviewsByNameAndYearFn = new lambdanode.NodejsFunction(
@@ -83,6 +94,7 @@ export class AppApi extends Construct {
           TABLE_NAME: props.dynamoDbTable.tableName,
           REGION: "eu-west-1",
         },
+        layers: [lambdaLayer]
       }
     );
     const updateReviewsByNameFn = new lambdanode.NodejsFunction(
@@ -98,6 +110,7 @@ export class AppApi extends Construct {
           TABLE_NAME: props.dynamoDbTable.tableName,
           REGION: "eu-west-1",
         },
+        layers: [lambdaLayer]
       }
     );
     const getAllReviewsByNameFn = new lambdanode.NodejsFunction(
@@ -113,6 +126,7 @@ export class AppApi extends Construct {
           TABLE_NAME: props.dynamoDbTable.tableName,
           REGION: "eu-west-1",
         },
+        layers: [lambdaLayer]
       }
     );
     const getTranslatedReviewsFn = new lambdanode.NodejsFunction(
@@ -128,6 +142,7 @@ export class AppApi extends Construct {
           TABLE_NAME: props.dynamoDbTable.tableName,
           REGION: "eu-west-1",
         },
+        layers: [lambdaLayer]
       }
     );
     getTranslatedReviewsFn.role?.attachInlinePolicy(new iam.Policy(this, 'TranslateTextPolicy', {

@@ -1,6 +1,6 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { createDynamoDBDocumentClient } from "../lambda-layer/utility";
 
 const ddbDocClient = createDynamoDBDocumentClient();
 
@@ -61,16 +61,3 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     }
 };
 
-function createDynamoDBDocumentClient() {
-    const ddbClient = new DynamoDBClient({ region: process.env.REGION });
-    const marshallOptions = {
-        convertEmptyValues: true,
-        removeUndefinedValues: true,
-        convertClassInstanceToMap: true,
-    };
-    const unmarshallOptions = {
-        wrapNumbers: false,
-    };
-    const translateConfig = { marshallOptions, unmarshallOptions };
-    return DynamoDBDocumentClient.from(ddbClient, translateConfig);
-}
