@@ -2,7 +2,7 @@
 
 __Name:__ Serene Babu
 
-__Video demonstration:__ ..... URL of your Youtube video demonstration ....
+__Video demonstration:__ https://www.youtube.com/watch?v=IW599F7t6x8
 
 This repository contains an implementation of a serverless REST API for the AWS platform. The CDK framework is used to provision its infrastructure. The API's domain context is movie reviews.
 
@@ -29,5 +29,12 @@ Following is the user confirmed using the authentication process
 
 ![](./images/pool.png)
 
+### Mutli Stack approach
+
+For more flexibility, scalability and interoperability
+
+### Lambda Layers
+
+For code reusability
 
 
